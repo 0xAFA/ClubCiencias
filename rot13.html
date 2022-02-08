@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"></script>
+    <script src="./rot13.js"></script>
+  </head>
+
+  <body>
+
+    <p>
+      Implementación del algoritmo ROT13.
+    </p>
+    <input id="message" value="Mensaje secreto" />
+    <br>
+    <button onclick="run()">Encriptar</button>
+    <button onclick="run()">Desencriptar</button>
+    <br>
+    <br>
+    <div>Resultado:</div>
+    <textarea id="output" style="width: 100%;" rows="6" disabled></textarea>
+
+    <div>
+        <p>Código del encriptador:</p>
+        <textarea id="encrypt_code" style="width: 100%;" rows="6" disabled></textarea>
+    </div>
+    
+    <div>
+        <p>Código del desencriptador:</p>
+        <textarea id="decrypt_code" style="width: 100%;" rows="6" disabled></textarea>
+    </div>
+    
+    <script>
+
+      document.getElementById("encrypt_code").value = encrypt;
+      // En rot13 con un alfabeto de 26 letras, las funciones para encriptar
+      // y desencriptar son idénticas.
+      document.getElementById("decrypt_code").value = encrypt;
+
+      const output = document.getElementById("output");
+      const code = document.getElementById("code");
+
+      function addToOutput(s) {
+        output.value += s + "\n";
+      }
+
+      output.value = "Cargando entorno de Python...\n";
+      
+      async function main() {
+        let pyodide = await loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.19.0/full/",
+        });
+        output.value = "¡Listo!\n";
+        return pyodide;
+      }
+      let pyodideReadyPromise = main();
+
+      async function run() {
+        let pyodide = await pyodideReadyPromise;
+        try {
+          output.value = "Encriptando..."
+          let result = pyodide.runPython(encrypt);
+          output.value = result;
+        } catch (err) {
+          addToOutput(err);
+        }
+      }
+
+    </script>
+  </body>
+</html>
