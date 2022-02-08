@@ -3,10 +3,17 @@
   <head>
     <meta charset="UTF-8">
     <script src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"></script>
-    <script src="./rot13.js"></script>
   </head>
 
   <body>
+
+    <script>
+        encrypt = ""
+
+        fetch('./rot13_encrypt.py')
+            .then(response => response.text())
+            .then(data => encrypt=data);
+    </script>
 
     <p>
       Implementación del algoritmo ROT13.
