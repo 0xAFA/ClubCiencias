@@ -1,3 +1,1 @@
-![](readme.jpg)
-
-af2047.github.io/ClubCiencias/index.html
+[Ver en GitHub Pages](https://af2047.github.io/ClubCiencias/index.html)
