@@ -7,13 +7,7 @@
 
   <body>
 
-    <script>
-        encrypt = ""
 
-        fetch('./rot13_encrypt.py')
-            .then(response => response.text())
-            .then(data => encrypt=data);
-    </script>
 
     <p>
       Implementación del algoritmo ROT13.
@@ -36,14 +30,14 @@
         <p>Código del desencriptador:</p>
         <textarea id="decrypt_code" style="width: 100%;" rows="6" disabled></textarea>
     </div>
-    
+
     <script>
+      encrypt = ""
 
-      document.getElementById("encrypt_code").value = encrypt;
-      // En rot13 con un alfabeto de 26 letras, las funciones para encriptar
-      // y desencriptar son idénticas.
-      document.getElementById("decrypt_code").value = encrypt;
-
+      fetch('./rot13_encrypt.py')
+          .then(response => response.text())
+          .then(data => encrypt=data);
+    
       const output = document.getElementById("output");
       const code = document.getElementById("code");
 
@@ -58,12 +52,22 @@
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.19.0/full/",
         });
         output.value = "¡Listo!\n";
+        
+        document.getElementById("encrypt_code").value = encrypt;
+        // En rot13 con un alfabeto de 26 letras, las funciones para encriptar
+        // y desencriptar son idénticas.
+        document.getElementById("decrypt_code").value = encrypt;
+        
         return pyodide;
       }
+
       let pyodideReadyPromise = main();
+      
+
 
       async function run() {
         let pyodide = await pyodideReadyPromise;
+
         try {
           output.value = "Encriptando..."
           let result = pyodide.runPython(encrypt);
