@@ -1,53 +1,95 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"></script>
-  </head>
 
-  <body>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"></script>
+  <!-- Framework CSS Materialize  -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <br>
+    <h4>Algoritmo afín</h4>
 
     <p>
-      Implementación del algoritmo afín. Los parámetros a,b deben ser menores que n (n=26), y primos entre sí.
+      Este algoritmo reemplaza cada letra con la que ocupa la posición (ax+b) módulo n en el alfabeto, donde a y b son parámetros enteros y n es la longitud del alfabeto.
     </p>
-    <input id="message" value="Mensaje secreto" />
-    <br>
-    <p> Parámetros: </p>
-    <div>
-      <p>a:</p>
-      <input id="p1" value="a" />
-    </div>
-    <p>b:</p>
-    <input id="p2" value="b" />
-    <br>
-    <button onclick="run()">Encriptar</button>
-    <button onclick="run_decrypt()">Desencriptar</button>
-    <br>
-    <br>
-    <div>Resultado:</div>
-    <textarea id="output" style="width: 100%;" rows="1" disabled></textarea>
 
-    <div>
-        <p>Código del encriptador:</p>
-        <textarea id="encrypt_code" style="width: 100%;" rows="6" disabled></textarea>
+    <div class="row">
+      <form class="col s12">
+
+        <div class="input-field col s12">
+          <input id="message" type="text" class="validate">
+          <label for="message">Mensaje secreto</label>
+
+        </div>
+      </form>
     </div>
-    
-    <div>
-        <p>Código del desencriptador:</p>
-        <textarea id="decrypt_code" style="width: 100%;" rows="6" disabled></textarea>
+    <div class="row">
+      <form class="col s12">
+
+        <div class="input-field col s6">
+          <input id="p1" type="text" class="validate">
+          <label for="p1">Parámetro a</label>
+
+        </div>
+
+        <div class="input-field col s6">
+          <input id="p2" type="text" class="validate">
+          <label for="p2">Parámetro b</label>
+
+        </div>
+      </form>
+    </div>
+    <div class="row">
+      <a onclick="run()" class="waves-effect waves-light btn">ENCRIPTAR</a>
+      <a onclick="run_decrypt()" class="waves-effect waves-light btn">DESENCRIPTAR</a>
+    </div>
+    <div class="row">
+      <div>Resultado:</div>
+      <textarea id="output" style="width: 100%;" rows="6" disabled class="materialize-textarea"></textarea>
+    </div>
+    <div class="row"></div>
+    <div class="row"></div>
+    <div class="row">
+      <div class="col s12">
+        <ul class="tabs">
+          <li class="tab col s2 disabled"><a href="#blop" class="teal-text">CÓDIGO FUENTE:</a></li>
+          <li class="tab col s5"><a href="#cfencrypt" class="active">Encriptador</a></li>
+          <li class="tab col s5"><a href="#cfdecrypt">Desencriptador</a></li>
+        </ul>
+      </div>
+      <div id="cfencrypt" class="col s12">
+        <textarea id="encrypt_code" style="width: 100%;" class="materialize-textarea" disabled></textarea>
+      </div>
+      <div id="cfdecrypt" class="col s12">
+        <textarea id="decrypt_code" style="width: 100%;" class="materialize-textarea" disabled></textarea>
+      </div>
     </div>
 
     <script>
+
+      // Inicializar elementos interactivos de MaterializeCSS
+      document.addEventListener('DOMContentLoaded', function () {
+        M.AutoInit();
+      });
+
+      // Cargar encriptador
       encrypt = ""
+      decrypt = ""
 
       fetch('./afin_encrypt.py')
-          .then(response => response.text())
-          .then(data => encrypt=data);
+        .then(response => response.text())
+        .then(data => encrypt = data);
 
-      fetch('./afin_decrypt.py')
+        fetch('./afin_decrypt.py')
           .then(response => response.text())
           .then(data => decrypt=data);
-    
+
       const output = document.getElementById("output");
       const code = document.getElementById("code");
 
@@ -56,23 +98,23 @@
       }
 
       output.value = "Cargando entorno de Python...\n";
-      
+
       async function main() {
         let pyodide = await loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.19.0/full/",
         });
         output.value = "¡Listo!\n";
-        
+
         document.getElementById("encrypt_code").value = encrypt;
         // En rot13 con un alfabeto de 26 letras, las funciones para encriptar
         // y desencriptar son idénticas.
         document.getElementById("decrypt_code").value = decrypt;
-        
+
         return pyodide;
       }
 
       let pyodideReadyPromise = main();
-      
+
 
 
       async function run() {
@@ -99,6 +141,9 @@
         }
       }
 
+
+
     </script>
-  </body>
+</body>
+
 </html>
