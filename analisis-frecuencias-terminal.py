@@ -27,5 +27,5 @@ while True:
     if letra=="SALIR": break
     print("Introduce con qué letra reemplazarla.")
     letra2 = input().upper()
-    print(mensaje.replace(letra, "\033[91m" + letra2 + "\033[0m").capitalize())
-    mensaje = mensaje.replace(letra, "\033[94m" + letra2 + "\033[0m")
+    print(mensaje.replace(letra, bcolors.FAIL + letra2 + bcolors.ENDC).capitalize())
+    mensaje = mensaje.replace(letra, bcolors.OKBLUE + letra2 + bcolors.ENDC)

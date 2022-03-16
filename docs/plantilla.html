@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 
+<!-- Para añadir una nueva página, modificar los campos indicados con comentarios -->
+
 <head>
   <meta charset="UTF-8">
   <script src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"></script>
-  <!-- Framework CSS Materialize  -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -13,15 +14,18 @@
 <body>
   <div class="container">
     <br>
-    <h4>Algoritmo afín</h4>
+    <!-- Título -->
+    <h4>Algoritmo ROT13</h4>
 
+    <!-- Descripción -->
     <p>
-      Este algoritmo reemplaza cada letra con la que ocupa la posición (ax+b) módulo n en el alfabeto, donde a y b son parámetros enteros y n es la longitud del alfabeto.
+      Este algoritmo reemplaza cada letra con la que ocupa trece posiciones por delante en el alfabeto.
     </p>
 
     <div class="row">
       <form class="col s12">
 
+        <!-- Formulario en el que el usuario introduce el mensaje secreto -->
         <div class="input-field col s12">
           <input id="message" type="text" class="validate">
           <label for="message">Mensaje secreto</label>
@@ -29,7 +33,11 @@
         </div>
       </form>
     </div>
-    <div class="row">
+
+    <!-- Si el encriptador necesita parámetros adicionales, añadir otra fila
+    de campos de entrada. -->
+
+    <!-- <div class="row">
       <form class="col s12">
 
         <div class="input-field col s6">
@@ -44,7 +52,8 @@
 
         </div>
       </form>
-    </div>
+    </div> -->
+
     <div class="row center-align">
       <a onclick="runEncrypt()" class="waves-effect waves-light btn">
         <i class="material-icons left">lock_outline</i>ENCRIPTAR
@@ -80,24 +89,31 @@
       </div>
     </div>
 
+    <!-- En el script, sólo hay que cambiar los nombres de archivo 
+    (encryptFilename y decryptFilename) -->
     <script>
+
+      // Nombre de archivo del encriptador y desencriptador
+      // (En el caso de ROT13 son el mismo)
+      encryptFilename = './rot13_encrypt.py'
+      decryptFilename = './rot13_encrypt.py'
 
       // Inicializar elementos interactivos de MaterializeCSS
       document.addEventListener('DOMContentLoaded', function () {
         M.AutoInit();
       });
 
-      // Cargar encriptador
+      // Cargar encriptador y desencriptador
       encrypt = ""
       decrypt = ""
 
-      fetch('./afin_encrypt.py')
+      fetch(encryptFilename)
         .then(response => response.text())
         .then(data => encrypt = data);
 
-      fetch('./afin_decrypt.py')
+      fetch(decryptFilename)
         .then(response => response.text())
-        .then(data => decrypt=data);
+        .then(data => decrypt = data);
 
       const output = document.getElementById("output");
       const code = document.getElementById("code");
@@ -124,8 +140,6 @@
 
       let pyodideReadyPromise = main();
 
-
-
       async function runEncrypt() {
         let pyodide = await pyodideReadyPromise;
 
@@ -133,8 +147,10 @@
           output.value = "Encriptando..."
           let result = pyodide.runPython(encrypt);
           output.value = result;
+          M.textareaAutoResize(output);
         } catch (err) {
           addToOutput(err);
+          M.textareaAutoResize(output);
         }
       }
 
@@ -159,7 +175,6 @@
           x.style.visibility = "hidden";
         }
       }
-
 
     </script>
 </body>

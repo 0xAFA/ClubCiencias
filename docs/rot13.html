@@ -29,17 +29,25 @@
         </div>
       </form>
     </div>
-    <div class="row">
-      <a onclick="run()" class="waves-effect waves-light btn">ENCRIPTAR</a>
-      <a onclick="run()" class="waves-effect waves-light btn">DESENCRIPTAR</a>
+    <div class="row center-align">
+      <a onclick="runEncrypt()" class="waves-effect waves-light btn">
+        <i class="material-icons left">lock_outline</i>ENCRIPTAR
+      </a>
+      <a onclick="runDecrypt()" class="waves-effect waves-light btn">
+        <i class="material-icons left">lock_open</i>DESENCRIPTAR</a>
     </div>
     <div class="row">
       <div>Resultado:</div>
-      <textarea id="output" style="width: 100%;" rows="6" disabled class="materialize-textarea"></textarea>
+      <textarea id="output" style="width: 100%;" disabled class="materialize-textarea"></textarea>
     </div>
     <div class="row"></div>
     <div class="row"></div>
-    <div class="row">
+    <div class="row"></div>
+    <div class="row center-align" id="sourceCodeButton">
+      <a onclick="toggleSource()" class="waves-effect waves-light btn">Mostrar código fuente</a>
+    </div>
+
+    <div class="row" id="sourceCode" style="visibility:hidden;">
       <div class="col s12">
         <ul class="tabs">
           <li class="tab col s2 disabled"><a href="#blop" class="teal-text">CÓDIGO FUENTE:</a></li>
@@ -57,17 +65,27 @@
 
     <script>
 
+      // Nombre de archivo del encriptador y desencriptador
+      // (En el caso de ROT13 son el mismo)
+      encryptFilename = './rot13_encrypt.py'
+      decryptFilename = './rot13_encrypt.py'
+
       // Inicializar elementos interactivos de MaterializeCSS
       document.addEventListener('DOMContentLoaded', function () {
         M.AutoInit();
       });
 
-      // Cargar encriptador
+      // Cargar encriptador y desencriptador
       encrypt = ""
+      decrypt = ""
 
-      fetch('./rot13_encrypt.py')
+      fetch(encryptFilename)
         .then(response => response.text())
         .then(data => encrypt = data);
+
+      fetch(decryptFilename)
+        .then(response => response.text())
+        .then(data => decrypt = data);
 
       const output = document.getElementById("output");
       const code = document.getElementById("code");
@@ -84,31 +102,51 @@
         });
         output.value = "¡Listo!\n";
 
+        document.getElementById("decrypt_code").value = decrypt;
+        M.textareaAutoResize(document.getElementById("decrypt_code"));
         document.getElementById("encrypt_code").value = encrypt;
-        // En rot13 con un alfabeto de 26 letras, las funciones para encriptar
-        // y desencriptar son idénticas.
-        document.getElementById("decrypt_code").value = encrypt;
+        M.textareaAutoResize(document.getElementById("encrypt_code"));
 
         return pyodide;
       }
 
       let pyodideReadyPromise = main();
 
-
-
-      async function run() {
+      async function runEncrypt() {
         let pyodide = await pyodideReadyPromise;
 
         try {
           output.value = "Encriptando..."
           let result = pyodide.runPython(encrypt);
           output.value = result;
+          M.textareaAutoResize(output);
+        } catch (err) {
+          addToOutput(err);
+          M.textareaAutoResize(output);
+        }
+      }
+
+      async function runDecrypt() {
+        let pyodide = await pyodideReadyPromise;
+
+        try {
+          output.value = "Desencriptando..."
+          let result = pyodide.runPython(decrypt);
+          output.value = result;
         } catch (err) {
           addToOutput(err);
         }
       }
 
-
+      function toggleSource() {
+        var x = document.getElementById("sourceCode");
+        if (x.style.visibility === "hidden") {
+          x.style.visibility = "visible";
+          document.getElementById("sourceCodeButton").style.display="none";
+        } else {
+          x.style.visibility = "hidden";
+        }
+      }
 
     </script>
 </body>
