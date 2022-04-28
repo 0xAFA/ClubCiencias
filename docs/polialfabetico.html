@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<!-- Para añadir una nueva página, modificar los campos indicados con comentarios -->
+
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.19.0/full/pyodide.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <br>
+    <!-- Título -->
+    <h4>Algoritmo polialfabético</h4>
+
+    <!-- Descripción -->
+    <p>
+      Este algoritmo reemplaza cada letra con otra letra del alfabeto, a elección del usuario.
+    </p>
+    <p>
+      Para desencriptar el mensaje es necesario conocer las sustituciones empleadas. En caso de no conocerlas, se puede tratar de averiguarlas mediante <a href="./analisis-frecuencias.html">análisis de frecuencias.</a>
+    </p>
+
+    <div class="row">
+      <form class="col s12">
+
+        <div class="input-field col s12">
+          <input id="message" type="text" class="validate" value="Mensaje secreto">
+          <label for="message">Mensaje secreto</label>
+
+        </div>
+      </form>
+    </div>
+
+    <div class="row">
+      <form class="col s12">
+
+        <div class="input-field col s12">
+          <input id="p1" type="text" class="validate" value="MNBVCZXLKJHASGFDQUWIEORPTY">
+          <label for="p1">Alfabeto de encriptación</label>
+        </div>
+
+      </form>
+    </div>
+
+    <div class="row center-align">
+      <a onclick="runEncrypt()" class="waves-effect waves-light btn">
+        <i class="material-icons left">lock_outline</i>ENCRIPTAR
+      </a>
+      <a onclick="runDecrypt()" class="waves-effect waves-light btn">
+        <i class="material-icons left">lock_open</i>DESENCRIPTAR</a>
+    </div>
+    <div class="row">
+      <div>Resultado:</div>
+      <textarea id="output" style="width: 100%;" disabled class="materialize-textarea"></textarea>
+    </div>
+
+    <div class="row"></div>
+    <div class="row"></div>
+    <div class="row"></div>
+    <div class="row center-align" id="sourceCodeButton">
+      <a onclick="toggleSource()" class="waves-effect waves-light btn">Mostrar código fuente</a>
+    </div>
+
+    <div class="row" id="sourceCode" style="visibility:hidden;">
+      <div class="col s12">
+        <ul class="tabs">
+          <li class="tab col s2 disabled"><a href="#blop" class="teal-text">CÓDIGO FUENTE:</a></li>
+          <li class="tab col s5"><a href="#cfencrypt" class="active">Encriptador</a></li>
+          <li class="tab col s5"><a href="#cfdecrypt">Desencriptador</a></li>
+        </ul>
+      </div>
+      <div id="cfencrypt" class="col s12">
+        <textarea id="encrypt_code" style="width: 100%;" class="materialize-textarea" disabled></textarea>
+      </div>
+      <div id="cfdecrypt" class="col s12">
+        <textarea id="decrypt_code" style="width: 100%;" class="materialize-textarea" disabled></textarea>
+      </div>
+    </div>
+
+    <!-- En el script, sólo hay que cambiar los nombres de archivo 
+    (encryptFilename y decryptFilename) -->
+    <script>
+
+      // Nombre de archivo del encriptador y desencriptador
+      // (En el caso de ROT13 son el mismo)
+      encryptFilename = './polialf_encrypt.py'
+      decryptFilename = './polialf_decrypt.py'
+
+      // Inicializar elementos interactivos de MaterializeCSS
+      document.addEventListener('DOMContentLoaded', function () {
+        M.AutoInit();
+      });
+
+      // Cargar encriptador y desencriptador
+      encrypt = ""
+      decrypt = ""
+
+      fetch(encryptFilename)
+        .then(response => response.text())
+        .then(data => encrypt = data);
+
+      fetch(decryptFilename)
+        .then(response => response.text())
+        .then(data => decrypt = data);
+
+      const output = document.getElementById("output");
+      const code = document.getElementById("code");
+
+      function addToOutput(s) {
+        output.value += s + "\n";
+      }
+
+      output.value = "Cargando entorno de Python...\n";
+
+      async function main() {
+        let pyodide = await loadPyodide({
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.19.0/full/",
+        });
+        output.value = "¡Listo!\n";
+
+        document.getElementById("decrypt_code").value = decrypt;
+        M.textareaAutoResize(document.getElementById("decrypt_code"));
+        document.getElementById("encrypt_code").value = encrypt;
+        M.textareaAutoResize(document.getElementById("encrypt_code"));
+
+        return pyodide;
+      }
+
+      let pyodideReadyPromise = main();
+
+      async function runEncrypt() {
+        let pyodide = await pyodideReadyPromise;
+
+        try {
+          output.value = "Encriptando..."
+          let result = pyodide.runPython(encrypt);
+          output.value = result;
+          M.textareaAutoResize(output);
+        } catch (err) {
+          addToOutput(err);
+          M.textareaAutoResize(output);
+        }
+      }
+
+      async function runDecrypt() {
+        let pyodide = await pyodideReadyPromise;
+
+        try {
+          output.value = "Desencriptando..."
+          let result = pyodide.runPython(decrypt);
+          output.value = result;
+        } catch (err) {
+          addToOutput(err);
+        }
+      }
+
+      function toggleSource() {
+        var x = document.getElementById("sourceCode");
+        if (x.style.visibility === "hidden") {
+          x.style.visibility = "visible";
+          document.getElementById("sourceCodeButton").style.display="none";
+        } else {
+          x.style.visibility = "hidden";
+        }
+      }
+
+    </script>
+</body>
+
+</html>
